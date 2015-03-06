@@ -16,15 +16,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#
-# 2015, March, 6th
-#   - reads /Applications/Install*OS X*.app if no program arg has been given
-#   - reads version information also from user specified folders
-#   - if DEBUG is set, output from the mount actions are being printed
-#
-# 2015, March 3rd
-#   - 1st release, code explained at http://goo.gl/am77H6
 
 # Explicitly set the PATH
 PATH="/sbin:/usr/sbin:/bin:/usr/bin"

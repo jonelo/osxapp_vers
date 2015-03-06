@@ -1,0 +1,18 @@
+March 7, 2015 v1.0
+- script requires at least Mac OS X 10.6.8 to run properly
+- script has been tested successfully with 
+  Install Mac OS X Lion.app, Install OS X Mountain Lion.app, 
+  Install OS X Mavericks.app and Install OS X Yosemite.app
+- reads /Applications/Install*OS X*.app if no program arg has been given
+- reads version information also from any Install[Mac ]OS X<name>.app 
+  if specified by the user as program argument(s)
+- if DEBUG environment variable is set, output from the mount actions 
+  are being printed to stdout
+- script has been committed on github
+
+March 4, 2015
+- minor bug fixed, see also update section at http://goo.gl/am77H6
+
+March 3, 2015
+- 1st release, code explained at http://goo.gl/am77H6
+
