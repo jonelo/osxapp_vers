@@ -1,0 +1,121 @@
+#!/bin/bash
+
+# osxapp_vers 1.0
+# Get both product version and build version of OS X from Install*OS X*.app
+#
+# Copyright 2015 Johann N. Loefflmann
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#
+# 2015, March, 6th
+#   - reads /Applications/Install*OS X*.app if no program arg has been given
+#   - reads version information also from user specified folders
+#   - if DEBUG is set, output from the mount actions are being printed
+#
+# 2015, March 3rd
+#   - 1st release, code explained at http://goo.gl/am77H6
+
+# Explicitly set the PATH
+PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+
+# Supported OS names, update if applicable
+SUPPORTED_OS=('Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+
+# Do we want verbose output?
+if [ -z $DEBUG ]; then
+    DEBUG=/dev/null
+else
+    DEBUG=/dev/stdout
+fi
+
+# Backup and set the Internal Field Separator (IFS) to newline,
+# because there are blanks in the filename called "Install OS X *.app"
+IFS_BACKUP=$IFS
+IFS=$'\n'
+
+# Update SUPPORTED_OS, because $IFS has changed
+SUPPORTED_OS=$(printf "%s\n" ${SUPPORTED_OS[@]})
+
+if [ $# = 0 ]; then
+    # No args have been given
+    # Find any OS X installers in /Applications
+    FILES=$(ls -ld1 /Applications/Install\ *OS\ X\ *.app 2>/dev/null)
+else
+    # Use the program arguments as the input
+    FILES=$(printf "%s\n" $@)
+fi
+
+for FILE in $FILES; do
+    # print the app folder
+    printf "\n%s:\n" "$FILE"
+
+    # Remove everything from the end including . (non-greedy)
+    # In other words, .app or .app/ will be removed from the end
+    APPNAME=${FILE%.*}
+    # Remove everything from the beginning including /
+    OSNAME=${APPNAME##*/}
+    # Remove everything from the beginning including "OS X "
+    OSNAME=${APPNAME##*OS\ X\ }
+    # Readd the .app suffix
+    APPNAME="$APPNAME.app"
+
+    # Is the .app supported by this script?
+    SUPPORTED=0
+    for OS in $SUPPORTED_OS
+    do
+        if [ "$OSNAME" = "$OS" ]; then
+            SUPPORTED=1
+        fi
+    done
+
+    if [ $SUPPORTED -eq 0 ]; then
+        printf "%s is not supported by this script.\n" $OSNAME
+    else
+        # Mount the InstallESD.dmg
+        hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
+            -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ > $DEBUG
+
+        # Mount the BaseSystem.dmg
+        hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
+            -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ > $DEBUG
+
+        # call sw_vers in the changed root environment
+        # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
+
+        # Read the xml
+        XMLCONTENT=$(<"/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist")
+
+        # Extract the product version from the xml
+        if [[ "$XMLCONTENT" =~ \<key\>ProductVersion\</key\>[[:space:]]*\<string\>([0-9\.]+)\</string\> ]]; then
+            printf "ProductVersion: %s\n" ${BASH_REMATCH[1]}
+        fi
+
+        # Extract the build version from the xml
+        if [[ "$XMLCONTENT" =~ \<key\>ProductBuildVersion\</key\>[[:space:]]*\<string\>([^\<]+)\</string\> ]]; then
+            printf "BuildVersion:   %s\n" ${BASH_REMATCH[1]}
+        fi
+
+        # Unmount again in reverse order
+        hdiutil detach "/Volumes/BaseSystem.$$" > $DEBUG
+        hdiutil detach "/Volumes/InstallESD.$$" > $DEBUG
+    fi
+done
+
+# Restore the IFS
+IFS=$IFS_BACKUP
+
+# Error message if there is no installer
+if [ -z "$FILES" ]; then
+    echo "There is no OS X Install app in /Applications"
+fi
