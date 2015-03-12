@@ -3,7 +3,7 @@ osxapp_vers
 
 What the project is for
 -----------------------
-The script called osxapp\_vers finds the complete product version and build version of OS X in an `Install*OS X*.app` package and prints it out like the OS X's /usr/bin/sw_vers does for a installed OS X product.
+The script called osxapp\_vers finds the complete product version and build version of OS X in an `Install*OS X*.app` package and prints it out like the OS X's /usr/bin/sw_vers does for an installed OS X product.
 
 The idea for this has been described at [my blog](http://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
@@ -26,8 +26,8 @@ In order to see details from the mount actions, you can enable debug output by e
 $ export DEBUG=/dev/stdout
 ```
 
-An example of how to use it or get it running
----------------------------------------------
+Examples of how to use it or get it running
+-------------------------------------------
 By default, if you don't specify any program parameters, the script reads all `/Applications/Install*OS X*.app` and prints out both product version and build version for each OS X that the installer is loaded with.
 
 ```bash
@@ -58,6 +58,16 @@ $ ./osxapp_vers '/Applications/Install OS X Mavericks.app'
 /Applications/Install OS X Mavericks.app:
 ProductVersion: 10.9.4
 BuildVersion:   13E28
+```
+
+If you have created a bootable OS X install media with `createinstallmedia` (that command line tool is provided by Apple as part of the OS X installer starting with Mavericks), you could also find out the version of OS X version that is on the install media by specifying the path to the .app folder.
+
+```bash
+./osxapp_vers '/Volumes/Install OS X Mavericks/Install OS X Mavericks.app/'
+
+/Volumes/Install OS X Mavericks/Install OS X Mavericks.app/:
+ProductVersion: 10.9.2
+BuildVersion:   13C64
 ```
 
 The license
