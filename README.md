@@ -10,7 +10,7 @@ The idea for this has been described at [my blog](http://loefflmann.blogspot.de/
 What are the system requirements
 --------------------------------
 * At least Mac OS X 10.6.8 (Snow Leopard) in order to run the script
-* `Install Mac OS X Lion.app`,  `Install OS X Mountain Lion.app`, `Install OS X Mavericks.app`, `Install OS X Yosemite.app` or `Install OS X El Capitan` from the Apple App Store (1st public version or any update release) or on a bootable OS X install media that has been created by Apple's `createinstallmedia`
+* `Install Mac OS X Lion.app`,  `Install OS X Mountain Lion.app`, `Install OS X Mavericks.app`, `Install OS X Yosemite.app` or `Install OS X El Capitan.app` from the Apple App Store (1st public version or any update release) or on a bootable OS X install media that has been created by Apple's `createinstallmedia`
 
 How to configure and install it
 -------------------------------
