@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.0
+# osxapp_vers 1.1
 # Get both product version and build version of OS X from Install*OS X*.app
 #
 # Copyright 2015 Johann N. Loefflmann
@@ -21,7 +21,7 @@
 PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
 # Supported OS names, update if applicable
-SUPPORTED_OS=('Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+SUPPORTED_OS=('Yosemite' 'Mavericks' 'Mountain Lion' 'Lion' 'El Capitan')
 
 # Do we want verbose output?
 if [ -z $DEBUG ]; then
