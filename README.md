@@ -1,4 +1,4 @@
-xapp_vers
+osxapp_vers
 ===========
 
 What the project is for
