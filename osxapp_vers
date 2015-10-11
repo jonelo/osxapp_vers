@@ -58,17 +58,22 @@ for FILE in $FILES; do
     OSNAME=${APPNAME##*/}
     # Remove everything from the beginning including "OS X "
     OSNAME=${APPNAME##*OS\ X\ }
-    # Readd the .app suffix
+    # Re-add the .app suffix
     APPNAME="$APPNAME.app"
 
-    # Is the .app supported by this script?
-    SUPPORTED=0
-    for OS in $SUPPORTED_OS
-    do
-        if [ "$OSNAME" = "$OS" ]; then
-            SUPPORTED=1
-        fi
-    done
+    if [ -z $NOCHECK ]; then
+        # NOCHECK is not set
+        # Is the .app supported by this script?
+        SUPPORTED=0
+        for OS in $SUPPORTED_OS
+        do
+            if [ "$OSNAME" = "$OS" ]; then
+                SUPPORTED=1
+            fi
+        done
+    else
+        SUPPORTED=1
+    fi
 
     if [ $SUPPORTED -eq 0 ]; then
         printf "%s is not supported by this script.\n" $OSNAME
