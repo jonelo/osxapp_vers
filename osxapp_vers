@@ -3,7 +3,7 @@
 # osxapp_vers 1.1
 # Get both product version and build version of OS X from Install*OS X*.app
 #
-# Copyright 2015 Johann N. Loefflmann
+# Copyright 2015-2016 Johann N. Loefflmann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
 # Supported OS names, update if applicable
-SUPPORTED_OS=('Yosemite' 'Mavericks' 'Mountain Lion' 'Lion' 'El Capitan')
+SUPPORTED_OS=('El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z $DEBUG ]; then
@@ -58,17 +58,22 @@ for FILE in $FILES; do
     OSNAME=${APPNAME##*/}
     # Remove everything from the beginning including "OS X "
     OSNAME=${APPNAME##*OS\ X\ }
-    # Readd the .app suffix
+    # Re-add the .app suffix
     APPNAME="$APPNAME.app"
 
-    # Is the .app supported by this script?
-    SUPPORTED=0
-    for OS in $SUPPORTED_OS
-    do
-        if [ "$OSNAME" = "$OS" ]; then
-            SUPPORTED=1
-        fi
-    done
+    if [ -z $NOCHECK ]; then
+        # NOCHECK is not set
+        # Is the .app supported by this script?
+        SUPPORTED=0
+        for OS in $SUPPORTED_OS
+        do
+            if [ "$OSNAME" = "$OS" ]; then
+                SUPPORTED=1
+            fi
+        done
+    else
+        SUPPORTED=1
+    fi
 
     if [ $SUPPORTED -eq 0 ]; then
         printf "%s is not supported by this script.\n" $OSNAME
