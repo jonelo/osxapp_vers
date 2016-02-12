@@ -2,7 +2,7 @@ February 13, 2016 v1.1
 - release ready
 
 October 11, 2015
-- added NOCHECK feature, If NOCHECK is set, there will be no checks 
+- added NOCHECK feature, if NOCHECK is set, there will be no checks 
   with respect to OS X app names. Useful setting if a new OS X has
   been released by Apple and the SUPPORTED_OS is not updated yet in the script.
 
