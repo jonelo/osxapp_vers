@@ -1,4 +1,12 @@
-October 1, 2015 v1.1
+February 13, 2016 v1.1
+- release ready
+
+October 11, 2015
+- added NOCHECK feature, If NOCHECK is set, there will be no checks 
+  with respect to OS X app names. Useful setting if a new OS X has
+  been released by Apple and the SUPPORTED_OS is not updated yet in the script.
+
+October 1, 2015
 - added compatibilty string for El Capitan (OS X 10.11)
 
 March 7, 2015 v1.0
