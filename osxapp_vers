@@ -3,7 +3,7 @@
 # osxapp_vers 1.1
 # Get both product version and build version of OS X from Install*OS X*.app
 #
-# Copyright 2015 Johann N. Loefflmann
+# Copyright 2015-2016 Johann N. Loefflmann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
 # Supported OS names, update if applicable
-SUPPORTED_OS=('Yosemite' 'Mavericks' 'Mountain Lion' 'Lion' 'El Capitan')
+SUPPORTED_OS=('El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z $DEBUG ]; then
