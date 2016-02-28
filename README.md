@@ -3,7 +3,7 @@ osxapp_vers
 
 What the project is for
 -----------------------
-The script called osxapp\_vers finds the product name, the complete product version and build version in a downloaded `Install*OS X*.app` package or in an mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the OS X's /usr/bin/sw_vers does for an installed OS X product.
+The script called osxapp\_vers finds the product name, the complete product version and build version in a downloaded `Install*OS X*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the OS X's /usr/bin/sw_vers does for an installed OS X product.
 
 The idea for this has been described at [my blog](http://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
