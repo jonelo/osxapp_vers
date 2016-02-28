@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# osxapp_vers 1.1
-# Get both product version and build version of OS X from Install*OS X*.app
+# osxapp_vers 1.2
+# Get product name, product version and build version of [Mac] OS X
+# from "Install*OS X*.app" resp. from "Mac OS X install DVD"
 #
 # Copyright 2015-2016 Johann N. Loefflmann
 #
@@ -20,7 +21,29 @@
 # Explicitly set the PATH
 PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
-# Supported OS names, update if applicable
+# Prints one token from a xml content, prints nothing if there is no match
+# Params: $1: xml content, $2: key in the xml, $3: key name in the output
+function print_xml_token {
+    # Extract the token name from the xml
+    if [[ "$1" =~ \<key\>$2\</key\>[[:space:]]*\<string\>([^\<]+)\</string\> ]]; then
+        printf "$3:\t%s\n" ${BASH_REMATCH[1]}
+    fi
+}
+
+# Prints ProductName, ProductVersion and BuildVersion from a xml content
+# Params: $1: the name of the xml file
+function print_xml_info {
+    # Read the xml
+    XMLCONTENT=$(<"$1")
+
+    print_xml_token "$XMLCONTENT" 'ProductName' 'ProductName'
+    print_xml_token "$XMLCONTENT" 'ProductVersion' 'ProductVersion'
+    print_xml_token "$XMLCONTENT" 'ProductBuildVersion' 'BuildVersion'
+    printf "\n"
+}
+
+# Supported OS names for the "Install *OS X <name>.app",
+# update list if applicable
 SUPPORTED_OS=('El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
@@ -47,71 +70,89 @@ else
     FILES=$(printf "%s\n" $@)
 fi
 
-for FILE in $FILES; do
-    # print the app folder
-    printf "\n%s:\n" "$FILE"
+# Error message if there is no installer
+if [ -z "$FILES" ]; then
+    printf "There is no \"Install *OS X *.app\" in /Applications\n" > $DEBUG
+else
+    for FILE in $FILES; do
+        # print the app folder
+        printf "%s:\n" "$FILE"
 
-    # Remove everything from the end including . (non-greedy)
-    # In other words, .app or .app/ will be removed from the end
-    APPNAME=${FILE%.*}
-    # Remove everything from the beginning including /
-    OSNAME=${APPNAME##*/}
-    # Remove everything from the beginning including "OS X "
-    OSNAME=${APPNAME##*OS\ X\ }
-    # Re-add the .app suffix
-    APPNAME="$APPNAME.app"
+        # Remove everything from the end including . (non-greedy)
+        # In other words, .app or .app/ will be removed from the end
+        APPNAME=${FILE%.*}
+        # Remove everything from the beginning including /
+        OSNAME=${APPNAME##*/}
+        # Remove everything from the beginning including "OS X "
+        OSNAME=${APPNAME##*OS\ X\ }
+        # Re-add the .app suffix
+        APPNAME="$APPNAME.app"
 
-    if [ -z $NOCHECK ]; then
-        # NOCHECK is not set
-        # Is the .app supported by this script?
-        SUPPORTED=0
-        for OS in $SUPPORTED_OS
-        do
-            if [ "$OSNAME" = "$OS" ]; then
-                SUPPORTED=1
+        if [ -z $NOCHECK ]; then
+            # NOCHECK is not set
+            # Is the .app supported by this script?
+            SUPPORTED=0
+            for OS in $SUPPORTED_OS
+            do
+                if [ "$OSNAME" = "$OS" ]; then
+                    SUPPORTED=1
+                fi
+            done
+        else
+            SUPPORTED=1
+        fi
+
+        if [ $SUPPORTED -eq 0 ]; then
+            printf "%s is not supported by this script. Set NOCHECK to bypass this check.\n" $OSNAME
+        else
+            # Mount the InstallESD.dmg
+            hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
+                -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ > $DEBUG
+
+            # Mount the BaseSystem.dmg
+            hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
+                -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ > $DEBUG
+
+            # call sw_vers in the changed root environment
+            # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
+
+            # Read the xml and print info
+            print_xml_info "/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist"
+
+            # Unmount again in reverse order
+            hdiutil detach "/Volumes/BaseSystem.$$" > $DEBUG
+            hdiutil detach "/Volumes/InstallESD.$$" > $DEBUG
+        fi
+    done
+fi
+
+# And now let's do it for any mounted Mac OS X Install CD/DVD images
+# (Mac OS X 10.0 Cheetah) - Mac OS X 10.6 Snow Leopard)
+#
+if [ $# = 0 ]; then
+    # No args have been given
+    # Find any mounted Mac OS X Install CD/DVD images in /Volumes
+    FILES=$(ls -ld1 /Volumes/Mac\ OS\ X\ Install\ * 2>/dev/null)
+
+    # Message if there are no mounted DVD images 
+    if [ -z "$FILES" ]; then
+        printf "There is no \"Mac OS X Install *\" in /Volumes\n" > $DEBUG
+    else
+        for FILE in $FILES; do
+            XML="$FILE/System/Library/CoreServices/SystemVersion.plist"
+            # there are also Disk 2 and Disk 3 CDs that don't contain
+            # an installer
+            if [ -f "$XML" ]; then
+                # print the app folder
+                printf "%s:\n" "$FILE"
+                print_xml_info "$XML"
+            else
+                printf "\"$FILE\" found, but it does not contain an installer\n" > $DEBUG
             fi
         done
-    else
-        SUPPORTED=1
     fi
-
-    if [ $SUPPORTED -eq 0 ]; then
-        printf "%s is not supported by this script.\n" $OSNAME
-    else
-        # Mount the InstallESD.dmg
-        hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
-            -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ > $DEBUG
-
-        # Mount the BaseSystem.dmg
-        hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
-            -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ > $DEBUG
-
-        # call sw_vers in the changed root environment
-        # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
-
-        # Read the xml
-        XMLCONTENT=$(<"/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist")
-
-        # Extract the product version from the xml
-        if [[ "$XMLCONTENT" =~ \<key\>ProductVersion\</key\>[[:space:]]*\<string\>([0-9\.]+)\</string\> ]]; then
-            printf "ProductVersion: %s\n" ${BASH_REMATCH[1]}
-        fi
-
-        # Extract the build version from the xml
-        if [[ "$XMLCONTENT" =~ \<key\>ProductBuildVersion\</key\>[[:space:]]*\<string\>([^\<]+)\</string\> ]]; then
-            printf "BuildVersion:   %s\n" ${BASH_REMATCH[1]}
-        fi
-
-        # Unmount again in reverse order
-        hdiutil detach "/Volumes/BaseSystem.$$" > $DEBUG
-        hdiutil detach "/Volumes/InstallESD.$$" > $DEBUG
-    fi
-done
+fi
 
 # Restore the IFS
 IFS=$IFS_BACKUP
 
-# Error message if there is no installer
-if [ -z "$FILES" ]; then
-    echo "There is no OS X Install app in /Applications"
-fi
