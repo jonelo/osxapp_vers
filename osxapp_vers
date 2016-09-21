@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# osxapp_vers 1.2
+# osxapp_vers 1.3
 # Get product name, product version and build version of [Mac] OS X
-# from "Install*OS X*.app" resp. from "Mac OS X install DVD"
+# from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
 # Copyright 2015-2016 Johann N. Loefflmann
 #
@@ -42,9 +42,9 @@ function print_xml_info {
     printf "\n"
 }
 
-# Supported OS names for the "Install *OS X <name>.app",
-# update list if applicable
-SUPPORTED_OS=('El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+# Supported OS names for the "Install *OS X <name>.app", resp. 
+# "Install macOS <name>.app", update list if applicable
+SUPPORTED_OS=('Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z $DEBUG ]; then
@@ -64,7 +64,8 @@ SUPPORTED_OS=$(printf "%s\n" ${SUPPORTED_OS[@]})
 if [ $# = 0 ]; then
     # No args have been given
     # Find any OS X installers in /Applications
-    FILES=$(ls -ld1 /Applications/Install\ *OS\ X\ *.app 2>/dev/null)
+    FILES=$(ls -ld1 /Applications/Install\ *OS\ X\ *.app 2>/dev/null;\
+            ls -ld1 /Applications/Install\ macOS\ *.app 2>/dev/null)
 else
     # Use the program arguments as the input
     FILES=$(printf "%s\n" $@)
@@ -72,7 +73,7 @@ fi
 
 # Error message if there is no installer
 if [ -z "$FILES" ]; then
-    printf "There is no \"Install *OS X *.app\" in /Applications\n" > $DEBUG
+    printf "INFO:  There is no \"Install *OS X *.app\" and no \"Install macOS *.app\" in /Applications\n"
 else
     for FILE in $FILES; do
         # print the app folder
@@ -81,10 +82,12 @@ else
         # Remove everything from the end including . (non-greedy)
         # In other words, .app or .app/ will be removed from the end
         APPNAME=${FILE%.*}
-        # Remove everything from the beginning including /
-        OSNAME=${APPNAME##*/}
-        # Remove everything from the beginning including "OS X "
-        OSNAME=${APPNAME##*OS\ X\ }
+
+        # Remove everything from the beginning including "OS X " or "macOS "
+        OSNAME=${APPNAME}
+        OSNAME=${OSNAME##*OS\ X\ }
+        OSNAME=${OSNAME##*macOS\ }
+
         # Re-add the .app suffix
         APPNAME="$APPNAME.app"
 
@@ -103,15 +106,26 @@ else
         fi
 
         if [ $SUPPORTED -eq 0 ]; then
-            printf "%s is not supported by this script. Set NOCHECK to bypass this check.\n" $OSNAME
+            printf "ERROR: Investigating the %s installer is not supported by this script.\n" $OSNAME
+            printf "       Set the NOCHECK environment variable to bypass this check.\n"
         else
+            # The macOS Sierra installer leaves the mount point called "/Volumes/OS X Install ESD" open
+            # after closing it, so let's try to unmount it now ...
+            hdiutil detach "/Volumes/OS X Install ESD" &> $DEBUG
+            # exit code 16 means "Resource busy"
+            if [ $? -eq 16 ]; then
+                # Give the user the option to close the installer manually.
+                printf "ERROR: Resource is in use. Please close the Apple installer. Exit.\n"
+                exit
+            fi
+
             # Mount the InstallESD.dmg
             hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
-                -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ > $DEBUG
+                -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ &> $DEBUG
 
             # Mount the BaseSystem.dmg
             hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
-                -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ > $DEBUG
+                -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
 
             # call sw_vers in the changed root environment
             # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
@@ -120,8 +134,8 @@ else
             print_xml_info "/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist"
 
             # Unmount again in reverse order
-            hdiutil detach "/Volumes/BaseSystem.$$" > $DEBUG
-            hdiutil detach "/Volumes/InstallESD.$$" > $DEBUG
+            hdiutil detach "/Volumes/BaseSystem.$$" &> $DEBUG
+            hdiutil detach "/Volumes/InstallESD.$$" &> $DEBUG
         fi
     done
 fi
@@ -136,7 +150,8 @@ if [ $# = 0 ]; then
 
     # Message if there are no mounted DVD images 
     if [ -z "$FILES" ]; then
-        printf "There is no \"Mac OS X Install *\" in /Volumes\n" > $DEBUG
+        printf "INFO: No mounted Mac OS X Install CD/DVD images found\n"
+        printf "      (no \"Mac OS X Install *\" in /Volumes)\n"
     else
         for FILE in $FILES; do
             XML="$FILE/System/Library/CoreServices/SystemVersion.plist"
@@ -147,7 +162,7 @@ if [ $# = 0 ]; then
                 printf "%s:\n" "$FILE"
                 print_xml_info "$XML"
             else
-                printf "\"$FILE\" found, but it does not contain an installer\n" > $DEBUG
+                printf "INFO: \"$FILE\" found, but it does not contain an installer\n"
             fi
         done
     fi
