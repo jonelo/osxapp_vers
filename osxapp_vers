@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.3
+# osxapp_vers 1.4
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
@@ -44,7 +44,7 @@ function print_xml_info {
 
 # Supported OS names for the "Install *OS X <name>.app", resp. 
 # "Install macOS <name>.app", update list if applicable
-SUPPORTED_OS=('Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+SUPPORTED_OS=('High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z $DEBUG ]; then
@@ -119,13 +119,19 @@ else
                 exit
             fi
 
-            # Mount the InstallESD.dmg
-            hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
-                -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ &> $DEBUG
+            if [ $OSNAME = "High Sierra" ]; then
+                # Mount the BaseSystem.dmg
+                hdiutil attach "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" \
+                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
+            else
+                # Mount the InstallESD.dmg
+                hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
+                    -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ &> $DEBUG
 
-            # Mount the BaseSystem.dmg
-            hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
-                -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
+                # Mount the BaseSystem.dmg
+                hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
+                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
+            fi
 
             # call sw_vers in the changed root environment
             # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
@@ -135,7 +141,10 @@ else
 
             # Unmount again in reverse order
             hdiutil detach "/Volumes/BaseSystem.$$" &> $DEBUG
-            hdiutil detach "/Volumes/InstallESD.$$" &> $DEBUG
+
+            if [ $OSNAME != "High Sierra" ]; then
+                hdiutil detach "/Volumes/InstallESD.$$" &> $DEBUG
+            fi
         fi
     done
 fi
