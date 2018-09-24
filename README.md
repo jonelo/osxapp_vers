@@ -3,15 +3,15 @@ osxapp_vers
 
 What the project is for
 -----------------------
-The script called osxapp\_vers finds the product name, the complete product version and build version in a `Install*OS X*.app` package, in a `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the OS X's /usr/bin/sw_vers does for an installed OS X product.
+The script called osxapp\_vers finds the product name, the complete product version and build version in a `Install*OS X*.app` package, in a `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the macOS's /usr/bin/sw_vers does for an installed macOS product.
 
 The idea for this has been described at [my blog](http://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
 What are the system requirements
 --------------------------------
+* `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
+* Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
 * At least Mac OS X 10.6.8 (Snow Leopard) in order to run the script
-* `Install Mac OS X Lion.app`,  `Install OS X Mountain Lion.app`, `Install OS X Mavericks.app`, `Install OS X Yosemite.app`, `Install OS X El Capitan.app`, `Install macOS Sierra.app`, or `Install macOS High Sierra.app` from the Apple App Store (1st public version or any update release) or on a bootable OS X install media that has been created by Apple's `createinstallmedia`
-* Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk` 
 
 How to configure and install it
 -------------------------------
@@ -80,6 +80,11 @@ ProductName:	Mac OS X
 ProductVersion:	10.13
 BuildVersion:	17A365
 
+/Applications/Install macOS Mojave.app:
+ProductName:	Mac OS X
+ProductVersion:	10.14
+BuildVersion:	18A391
+
 /Volumes/Mac OS X Install DVD:
 ProductName:    Mac OS X
 ProductVersion: 10.5
@@ -103,6 +108,7 @@ If you have created a bootable OS X install media with `createinstallmedia` (tha
 ./osxapp_vers '/Volumes/Install OS X Mavericks/Install OS X Mavericks.app/'
 
 /Volumes/Install OS X Mavericks/Install OS X Mavericks.app/:
+ProductName:    Mac OS X
 ProductVersion: 10.9.2
 BuildVersion:   13C64
 ```

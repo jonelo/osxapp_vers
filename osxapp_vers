@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# osxapp_vers 1.4
+# osxapp_vers 1.5
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
-# Copyright 2015-2017 Johann N. Loefflmann
+# Copyright 2015-2018 Johann N. Loefflmann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ function print_xml_info {
 
 # Supported OS names for the "Install *OS X <name>.app", resp. 
 # "Install macOS <name>.app", update list if applicable
-SUPPORTED_OS=('High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+SUPPORTED_OS=('Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z $DEBUG ]; then
@@ -119,11 +119,13 @@ else
                 exit
             fi
 
-            if [ $OSNAME = "High Sierra" ]; then
+            if [ "$OSNAME" = "Mojave" -o "$OSNAME" = "High Sierra" ]; then
+            # Starting with High Sierra ...
                 # Mount the BaseSystem.dmg
                 hdiutil attach "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" \
                     -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
             else
+            # Anything earlier then High Sierra ...
                 # Mount the InstallESD.dmg
                 hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
                     -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ &> $DEBUG
@@ -142,7 +144,7 @@ else
             # Unmount again in reverse order
             hdiutil detach "/Volumes/BaseSystem.$$" &> $DEBUG
 
-            if [ $OSNAME != "High Sierra" ]; then
+            if [ "$OSNAME" != "Mojave" -a "$OSNAME" != "High Sierra" ]; then
                 hdiutil detach "/Volumes/InstallESD.$$" &> $DEBUG
             fi
         fi
@@ -179,4 +181,3 @@ fi
 
 # Restore the IFS
 IFS=$IFS_BACKUP
-
