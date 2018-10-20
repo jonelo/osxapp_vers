@@ -39,6 +39,13 @@ If you want to disable debug mode, enter
 $ export DEBUG=
 ```
 
+How to run it without installing it
+-----------------------------------
+```
+bash <(curl -Ls https://bit.ly/osxapp_vers)
+```
+
+
 Examples of how to use it or get it running
 -------------------------------------------
 By default, if you don't specify any program parameters, the script reads all `/Applications/Install*OS X*.app`, all `/Applications/Install macOS X*.app` and all `/Volumes/Mac OS X Install *` and prints out product name, product version and build version for each OS X that those installers are loaded with.

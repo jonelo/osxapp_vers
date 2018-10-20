@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.5
+# osxapp_vers 1.6
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
