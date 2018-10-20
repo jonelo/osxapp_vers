@@ -1,3 +1,7 @@
+October 20, 2018 v1.6
+- simplified check for macos starting with High Sierra in order not to
+  break on the successor of Mojave
+
 September 25, 2018 v1.5
 - added support for macOS Mojave
 

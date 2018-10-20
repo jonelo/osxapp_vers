@@ -119,7 +119,7 @@ else
                 exit
             fi
 
-            if [[ -e "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" ]]; then
+            if [ -f "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" ]; then
             # Starting with High Sierra ...
                 # Mount the BaseSystem.dmg
                 hdiutil attach "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" \
