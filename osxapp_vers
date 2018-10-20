@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.6
+# osxapp_vers 1.7
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
@@ -65,9 +65,9 @@ if [ $# = 0 ]; then
     # No args have been given
     # Find any OS X installers known to the Spotlight
     FILES=$(
-            mdfind "kMDItemFSName == 'Install OS X *.app'" 2>/dev/null;\
-            mdfind "kMDItemFSName == 'Install macOS *.app'" 2>/dev/null;\
-            )
+             mdfind "kMDItemFSName == 'Install OS X *.app'" 2>/dev/null;\
+             mdfind "kMDItemFSName == 'Install macOS *.app'" 2>/dev/null;\
+           )
 else
     # Use the program arguments as the input
     FILES=$(printf "%s\n" $@)

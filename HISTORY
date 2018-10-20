@@ -1,3 +1,6 @@
+October 20, 2018 v1.7
+- use Spotlight to find installers if no argument is given
+
 October 20, 2018 v1.6
 - simplified check for macos starting with High Sierra in order not to
   break on the successor of Mojave
