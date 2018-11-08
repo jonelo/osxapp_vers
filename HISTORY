@@ -1,3 +1,6 @@
+November 8, 2018 v1.8
+- support for a High Sierra or Mojave install stub
+
 October 20, 2018 v1.7
 - use Spotlight to find installers if no argument is given
 

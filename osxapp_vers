@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.7
+# osxapp_vers 1.8
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
@@ -122,32 +122,50 @@ else
             fi
 
             if [ -f "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" ]; then
-            # Starting with High Sierra ...
-                # Mount the BaseSystem.dmg
+                # Starting with High Sierra (>= 10.13)
                 hdiutil attach "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" \
                     -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
-            else
-            # Anything earlier then High Sierra ...
-                # Mount the InstallESD.dmg
+
+                CONTCODE=1
+
+            elif [ -f "$APPNAME/Contents/SharedSupport/InstallESD.dmg" ]; then
+                # Anything earlier then High Sierra (< 10.13) ...
                 hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
                     -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ &> $DEBUG
 
-                # Mount the BaseSystem.dmg
                 hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
                     -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
+
+                CONTCODE=2
+
+            elif [ -f "/macOS Install Data/BaseSystem.dmg" ]; then
+                printf "INFO: this an install stub and the install stub was running.\n"
+                # BaseSystem.dmg location is different if we have an install stub and
+                # the install stub was running
+                hdiutil attach "/macOS Install Data/BaseSystem.dmg" \
+                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
+
+                CONTCODE=1
+
+            else
+                printf "ERROR: this seems to be an install stub only, run it in order to download the required files.\n"
+                CONTCODE=0
+
             fi
 
             # call sw_vers in the changed root environment
             # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
 
-            # Read the xml and print info
-            print_xml_info "/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist"
+            if [ $CONTCODE -gt 0 ]; then
+                # Read the xml and print info
+                print_xml_info "/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist"
 
-            # Unmount again in reverse order
-            hdiutil detach "/Volumes/BaseSystem.$$" &> $DEBUG
+                # Unmount again in reverse order
+                hdiutil detach "/Volumes/BaseSystem.$$" &> $DEBUG
 
-            if [ "$OSNAME" != "Mojave" -a "$OSNAME" != "High Sierra" ]; then
-                hdiutil detach "/Volumes/InstallESD.$$" &> $DEBUG
+                if [ $CONTCODE -gt 1 ]; then
+                    hdiutil detach "/Volumes/InstallESD.$$" &> $DEBUG
+                fi
             fi
         fi
     done
