@@ -9,7 +9,7 @@ The idea for this has been described at [my blog](http://loefflmann.blogspot.de/
 
 What are the system requirements
 --------------------------------
-* `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
+* `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
 * Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
 * At least Mac OS X 10.6.8 (Snow Leopard) in order to run the script
 
