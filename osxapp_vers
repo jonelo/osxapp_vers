@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# osxapp_vers 1.8
+# osxapp_vers 1.9
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
-# Copyright 2015-2018 Johann N. Loefflmann
+# Copyright 2015-2019 Johann N. Loefflmann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ function print_xml_info {
 
 # Supported OS names for the "Install *OS X <name>.app", resp. 
 # "Install macOS <name>.app", update list if applicable
-SUPPORTED_OS=('Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+SUPPORTED_OS=('Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z $DEBUG ]; then
