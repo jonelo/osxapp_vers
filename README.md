@@ -7,11 +7,15 @@ The script called osxapp\_vers finds the product name, the complete product vers
 
 The idea for this has been described at [my blog](https://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
+
 What are the system requirements
 --------------------------------
 * `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
 * Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
 * At least Mac OS X 10.6.8 (Snow Leopard) in order to run the script
+
+See also "How to create a bootable installer for macOS?" at https://support.apple.com/en-us/HT201372
+
 
 How to configure and install it
 -------------------------------
@@ -38,6 +42,7 @@ If you want to disable debug mode, enter
 ```bash
 $ export DEBUG=
 ```
+
 
 How to run it without installing it
 -----------------------------------
@@ -120,9 +125,11 @@ ProductVersion: 10.9.2
 BuildVersion:   13C64
 ```
 
+
 The license
 -----------
 The license that the project is offered under is the [Apache 2.0 license](http://choosealicense.com/licenses/apache-2.0/).
+
 
 References
 ----------
