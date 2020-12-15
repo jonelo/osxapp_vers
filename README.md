@@ -5,7 +5,7 @@ What the project is for
 -----------------------
 The script called osxapp\_vers finds the product name, the complete product version and build version in a `Install*OS X*.app` package, in a `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the macOS's /usr/bin/sw_vers does for an installed macOS product.
 
-The idea for this has been described at [my blog](http://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
+The idea for this has been described at [my blog](https://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
 What are the system requirements
 --------------------------------
@@ -42,7 +42,7 @@ $ export DEBUG=
 How to run it without installing it
 -----------------------------------
 ```
-bash <(curl -Ls https://bit.ly/osxapp_vers)
+curl -Ls https://bit.ly/osxapp_vers | bash
 ```
 
 
@@ -126,4 +126,4 @@ The license that the project is offered under is the [Apache 2.0 license](http:/
 
 References
 ----------
-* http://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html
+* https://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html
