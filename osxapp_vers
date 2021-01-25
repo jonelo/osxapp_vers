@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# osxapp_vers 1.9
+# osxapp_vers 1.10
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
-# Copyright 2015-2019 Johann N. Loefflmann
+# Copyright 2015-2021 Johann N. Loefflmann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,15 +26,14 @@ PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 function print_xml_token {
     # Extract the token name from the xml
     if [[ "$1" =~ \<key\>$2\</key\>[[:space:]]*\<string\>([^\<]+)\</string\> ]]; then
-        printf "$3:\t%s\n" ${BASH_REMATCH[1]}
+        printf "$3:\t%s\n" "${BASH_REMATCH[1]}"
     fi
 }
 
 # Prints ProductName, ProductVersion and BuildVersion from a xml content
 # Params: $1: the name of the xml file
 function print_xml_info {
-    # Read the xml
-    XMLCONTENT=$(<"$1")
+    XMLCONTENT="$1"
 
     print_xml_token "$XMLCONTENT" 'ProductName' 'ProductName'
     print_xml_token "$XMLCONTENT" 'ProductVersion' 'ProductVersion'
@@ -44,10 +43,10 @@ function print_xml_info {
 
 # Supported OS names for the "Install *OS X <name>.app", resp. 
 # "Install macOS <name>.app", update list if applicable
-SUPPORTED_OS=('Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+SUPPORTED_OS=('Big Sur' 'Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
-if [ -z $DEBUG ]; then
+if [ -z "$DEBUG" ]; then
     DEBUG=/dev/null
 else
     DEBUG=/dev/stdout
@@ -58,19 +57,16 @@ fi
 IFS_BACKUP=$IFS
 IFS=$'\n'
 
-# Update SUPPORTED_OS, because $IFS has changed
-SUPPORTED_OS=$(printf "%s\n" ${SUPPORTED_OS[@]})
-
 if [ $# = 0 ]; then
     # No args have been given
-    # Find any OS X installers known to the Spotlight
+    # Find any OS X/macOS installers known to the Spotlight
     FILES=$(
              mdfind "kMDItemFSName == 'Install OS X *.app'" 2>/dev/null;\
              mdfind "kMDItemFSName == 'Install macOS *.app'" 2>/dev/null;\
            )
 else
     # Use the program arguments as the input
-    FILES=$(printf "%s\n" $@)
+    FILES=$(printf "%s\n" "$@")
 fi
 
 # Error message if there is no installer
@@ -93,11 +89,11 @@ else
         # Re-add the .app suffix
         APPNAME="$APPNAME.app"
 
-        if [ -z $NOCHECK ]; then
+        if [ -z "$NOCHECK" ]; then
             # NOCHECK is not set
             # Is the .app supported by this script?
             SUPPORTED=0
-            for OS in $SUPPORTED_OS
+            for OS in "${SUPPORTED_OS[@]}"
             do
                 if [ "$OSNAME" = "$OS" ]; then
                     SUPPORTED=1
@@ -108,7 +104,7 @@ else
         fi
 
         if [ $SUPPORTED -eq 0 ]; then
-            printf "ERROR: Investigating the %s installer is not supported by this script.\n" $OSNAME
+            printf "ERROR: Investigating the %s installer is not supported by this script.\n" "$OSNAME"
             printf "       Set the NOCHECK environment variable to bypass this check.\n"
         else
             # The macOS Sierra installer leaves the mount point called "/Volumes/OS X Install ESD" open
@@ -121,7 +117,14 @@ else
                 exit
             fi
 
-            if [ -f "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" ]; then
+            if [ -f "$APPNAME/Contents/SharedSupport/SharedSupport.dmg" ]; then
+                # Starting with Big Sur (>= 11.0.1)
+                hdiutil attach "$APPNAME/Contents/SharedSupport/SharedSupport.dmg" \
+                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
+
+                CONTCODE=11
+
+            elif [ -f "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" ]; then
                 # Starting with High Sierra (>= 10.13)
                 hdiutil attach "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" \
                     -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
@@ -156,9 +159,16 @@ else
             # call sw_vers in the changed root environment
             # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
 
+            if [ $CONTCODE -eq 11 ]; then
+                XMLCONTENT=$(unzip -c /Volumes/BaseSystem.$$/SFR/com_apple_MobileAsset_SFRSoftwareUpdate/*.zip AssetData/boot/SystemVersion.plist)
+                CONTCODE=1
+            else
+                XMLCONTENT=$(<"/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist")
+            fi
+
             if [ $CONTCODE -gt 0 ]; then
                 # Read the xml and print info
-                print_xml_info "/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist"
+                print_xml_info "$XMLCONTENT"
 
                 # Unmount again in reverse order
                 hdiutil detach "/Volumes/BaseSystem.$$" &> $DEBUG
@@ -193,7 +203,7 @@ if [ $# = 0 ]; then
                 printf "%s:\n" "$FILE"
                 print_xml_info "$XML"
             else
-                printf "INFO: \"$FILE\" found, but it does not contain an installer\n"
+                printf "INFO: \"%s\" found, but it does not contain an installer\n" "$FILE"
             fi
         done
     fi

@@ -3,14 +3,14 @@ osxapp_vers
 
 What the project is for
 -----------------------
-The script called osxapp\_vers finds the product name, the complete product version and build version in a `Install*OS X*.app` package, in a `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the macOS's /usr/bin/sw_vers does for an installed macOS product.
+The script called osxapp_vers finds the product name, the complete product version and build version in a `Install*OS X*.app` package, in a `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the macOS' `/usr/bin/sw_vers` does for an installed macOS product.
 
 The idea for this has been described at [my blog](https://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
 
 What are the system requirements
 --------------------------------
-* `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
+* Ìnstall macOS Big Sur.app`, `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
 * Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
 * At least Mac OS X 10.6.8 (Snow Leopard) in order to run the script
 
@@ -53,24 +53,30 @@ curl -Ls https://bit.ly/osxapp_vers | bash
 
 Examples of how to use it or get it running
 -------------------------------------------
-By default, if you don't specify any program parameters, the script reads all `/Applications/Install*OS X*.app`, all `/Applications/Install macOS X*.app` and all `/Volumes/Mac OS X Install *` and prints out product name, product version and build version for each OS X that those installers are loaded with.
+By default, if you don't specify any program parameters, the script reads all `Install*OS X*.app`, and `Install macOS X*.app` known to Spotlight and all `/Volumes/Mac OS X Install *` and prints out product name, product version and build version for each macOS that those installers are loaded with.
+
+Example output from runs without any program parameters:
 
 ```bash
-$ ./osxapp_vers
+/Volumes/Mac OS X Install DVD:
+ProductName:    Mac OS X
+ProductVersion: 10.5
+BuildVersion:   9A581
+
 /Applications/Install Mac OS X Lion.app:
 ProductName:    Mac OS X
 ProductVersion: 10.7.5
 BuildVersion:   11G63
 
-/Applications/Install OS X Mavericks.app:
-ProductName:    Mac OS X
-ProductVersion: 10.9.4
-BuildVersion:   13E28
-
 /Applications/Install OS X Mountain Lion.app:
 ProductName:    Mac OS X
 ProductVersion: 10.8.5
 BuildVersion:   12F45
+
+/Applications/Install OS X Mavericks.app:
+ProductName:    Mac OS X
+ProductVersion: 10.9.4
+BuildVersion:   13E28
 
 /Applications/Install OS X Yosemite.app:
 ProductName:    Mac OS X
@@ -97,10 +103,15 @@ ProductName:	Mac OS X
 ProductVersion:	10.14
 BuildVersion:	18A391
 
-/Volumes/Mac OS X Install DVD:
-ProductName:    Mac OS X
-ProductVersion: 10.5
-BuildVersion:   9A581
+/Applications/Install macOS Catalina.app:
+ProductName:	Mac OS X
+ProductVersion:	10.15
+BuildVersion:	19A583
+
+/Applications/Install macOS Big Sur.app:
+ProductName:	macOS
+ProductVersion:	11.1
+BuildVersion:	20C69
 ```
 
 If you specify program parameters, the script prints out product name, product version and build version for each Install OS X .app folder that you have specified.
@@ -114,7 +125,7 @@ ProductVersion: 10.9.4
 BuildVersion:   13E28
 ```
 
-If you have created a bootable OS X install media with `createinstallmedia` (that command line tool is provided by Apple as part of the OS X installer starting with Mavericks), you could also find out the version of OS X version that is on the install media by specifying the path to the .app folder.
+If you have created a bootable macOS install media with `createinstallmedia` (that command line tool is provided by Apple as part of the OS X installer starting with Mavericks), you could also find out the version of macOS version that is on the install media by specifying the path to the .app folder.
 
 ```bash
 ./osxapp_vers '/Volumes/Install OS X Mavericks/Install OS X Mavericks.app/'

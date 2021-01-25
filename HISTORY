@@ -1,3 +1,9 @@
+January 25, 2021, v1.10
+- added support for Big Sur
+
+October 8, 2019, v1.9
+- added support for Catalina
+
 November 8, 2018 v1.8
 - support for a High Sierra or Mojave install stub
 
@@ -31,7 +37,7 @@ October 11, 2015
   been released by Apple and the SUPPORTED_OS is not updated yet in the script.
 
 October 1, 2015
-- added compatibilty string for El Capitan (OS X 10.11)
+- added compatibility string for El Capitan (OS X 10.11)
 
 March 7, 2015 v1.0
 - script requires at least Mac OS X 10.6.8 to run properly
