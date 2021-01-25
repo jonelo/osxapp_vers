@@ -10,9 +10,13 @@ The idea for this has been described at [my blog](https://loefflmann.blogspot.de
 
 What are the system requirements
 --------------------------------
+* At least Mac OS X 10.6.8 (Snow Leopard) in order to run the bash script, older releases haven't been tested.
+
+
+What are the input requirements
+-------------------------------
 * `Install macOS Big Sur.app`, `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
 * Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
-* At least Mac OS X 10.6.8 (Snow Leopard) in order to run the script
 
 See also "How to create a bootable installer for macOS?" at https://support.apple.com/en-us/HT201372
 
