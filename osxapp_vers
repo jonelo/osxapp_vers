@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.10
+# osxapp_vers 1.11
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
@@ -43,7 +43,7 @@ function print_xml_info {
 
 # Supported OS names for the "Install *OS X <name>.app", resp. 
 # "Install macOS <name>.app", update list if applicable
-SUPPORTED_OS=('Big Sur' 'Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+SUPPORTED_OS=('Monterey' 'Big Sur' 'Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z "$DEBUG" ]; then
@@ -118,6 +118,10 @@ else
             fi
 
             if [ -f "$APPNAME/Contents/SharedSupport/SharedSupport.dmg" ]; then
+                # The macOS Monterey installer (12.0.1) leaves the mount point open
+                # after closing it, so let's unmount it now ...
+                hdiutil detach "/Volumes/Shared Support" &> $DEBUG
+
                 # Starting with Big Sur (>= 11.0.1)
                 hdiutil attach "$APPNAME/Contents/SharedSupport/SharedSupport.dmg" \
                     -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
