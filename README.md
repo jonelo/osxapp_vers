@@ -3,7 +3,7 @@ osxapp_vers
 
 What the project is for
 -----------------------
-The script called osxapp_vers finds the product name, the complete product version and build version in a `Install*OS X*.app` package, in a `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the macOS' `/usr/bin/sw_vers` does for an installed macOS product.
+The script called osxapp_vers finds the product name, the complete product version, and build version in an `Install*OS X*.app` package, in an `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the macOS' `/usr/bin/sw_vers` does for an installed macOS product.
 
 The idea for this has been described at [my blog](https://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
@@ -15,7 +15,7 @@ What are the system requirements
 
 What are the input requirements
 -------------------------------
-* `Install macOS Monterey.app`, `Install macOS Big Sur.app`, `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
+* `Install macOS Ventura.app`, `Install macOS Monterey.app`, `Install macOS Big Sur.app`, `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`
 * Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
 
 See also "How to create a bootable installer for macOS?" at https://support.apple.com/en-us/HT201372
@@ -121,6 +121,11 @@ BuildVersion:	20C69
 ProductName:	macOS
 ProductVersion:	12.0.1
 BuildVersion:	21A559
+
+/Applications/Install macOS Ventura.app:
+ProductName:	macOS
+ProductVersion:	13.0
+BuildVersion:	22A380
 ```
 
 If you specify program parameters, the script prints out product name, product version and build version for each Install OS X .app folder that you have specified.
