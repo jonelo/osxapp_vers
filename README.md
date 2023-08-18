@@ -26,38 +26,38 @@ How to configure and install it
 Download the osxapp_vers file from GitHub to a folder of your choice.
 
 ```bash
-curl -Ls https://bit.ly/osxapp_vers > osxapp_vers
+% curl -Ls https://bit.ly/osxapp_vers > osxapp_vers
 ```
 
 Set execute permissions.
 
 ```bash
-$ chmod +x ./osxapp_vers
+% chmod +x ./osxapp_vers
 ```
 
 In order to bypass a check that prevents the script from investigating an unknown macOS release, you can set the NOCHECK environment variable.
 
 ```bash
-$ export NOCHECK=1
+% export NOCHECK=1
 ```
 
 In order to see details from the mount actions and additional messages, you can enable debug output by exporting the DEBUG environment variable. Usually there is no need to do that.
 
 ```bash
-$ export DEBUG=/dev/stdout
+% export DEBUG=/dev/stdout
 ```
-
+ 
 If you want to disable debug mode, enter
 
 ```bash
-$ export DEBUG=
+% export DEBUG=
 ```
 
 
 How to run it without installing it
 -----------------------------------
 ```
-curl -Ls https://bit.ly/osxapp_vers | bash
+% curl -Ls https://bit.ly/osxapp_vers | bash
 ```
 
 
@@ -137,7 +137,7 @@ BuildVersion:	22A380
 If you specify program parameters, the script prints out product name, product version and build version for each Install OS X .app folder that you have specified.
 
 ```bash
-$ ./osxapp_vers '/Applications/Install OS X Mavericks.app'
+% ./osxapp_vers '/Applications/Install OS X Mavericks.app'
 
 /Applications/Install OS X Mavericks.app:
 ProductName:    Mac OS X
@@ -148,7 +148,7 @@ BuildVersion:   13E28
 If you have created a bootable macOS install media with `createinstallmedia` (that command line tool is provided by Apple as part of the OS X installer starting with Mavericks), you could also find out the version of macOS version that is on the install media by specifying the path to the .app folder.
 
 ```bash
-./osxapp_vers '/Volumes/Install OS X Mavericks/Install OS X Mavericks.app/'
+% ./osxapp_vers '/Volumes/Install OS X Mavericks/Install OS X Mavericks.app/'
 
 /Volumes/Install OS X Mavericks/Install OS X Mavericks.app/:
 ProductName:    Mac OS X
