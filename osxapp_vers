@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# osxapp_vers 1.12
+# osxapp_vers 1.13
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
-# Copyright 2015-2022 Johann N. Loefflmann
+# Copyright 2015-2023 Johann N. Loefflmann
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -164,7 +164,12 @@ else
             # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
 
             if [ $CONTCODE -eq 11 ]; then
-                XMLCONTENT=$(unzip -c /Volumes/BaseSystem.$$/SFR/com_apple_MobileAsset_SFRSoftwareUpdate/*.zip AssetData/boot/SystemVersion.plist)
+                if [ -d "/Volumes/BaseSystem.$$/SFR/" ]; then
+                    XMLCONTENT=$(unzip -c /Volumes/BaseSystem.$$/SFR/com_apple_MobileAsset_SFRSoftwareUpdate/*.zip AssetData/boot/SystemVersion.plist)
+                # e.g. macOS 13.5.1
+                else
+                    XMLCONTENT=$(unzip -c /Volumes/BaseSystem.$$/com_apple_MobileAsset_MacSoftwareUpdate/*.zip AssetData/boot/SystemVersion.plist)
+                fi
                 CONTCODE=1
             else
                 XMLCONTENT=$(<"/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist")
