@@ -23,7 +23,13 @@ See also "How to create a bootable installer for macOS?" at https://support.appl
 
 How to configure and install it
 -------------------------------
-Download the osxapp_vers file from GitHub to a folder of your choice and set execute permissions.
+Download the osxapp_vers file from GitHub to a folder of your choice.
+
+```bash
+curl -Ls https://bit.ly/osxapp_vers > osxapp_vers
+```
+
+Set execute permissions.
 
 ```bash
 $ chmod +x ./osxapp_vers
