@@ -47,16 +47,23 @@ In order to see details from the mount actions and additional messages, you can 
 % export DEBUG=/dev/stdout
 ```
  
-If you want to disable debug mode, enter
+If you want to disable debug mode again, enter
 
 ```bash
 % export DEBUG=
 ```
 
+How to run it
+-------------
+Execute.
+
+```bash
+% ./osxapp_vers
+```
 
 How to run it without installing it
 -----------------------------------
-```
+```bash
 % curl -Ls https://bit.ly/osxapp_vers | bash
 ```
 
