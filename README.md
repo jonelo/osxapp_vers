@@ -15,10 +15,24 @@ What are the system requirements
 
 What are the input requirements
 -------------------------------
-* `Install macOS Sonoma.app`, `Install macOS Ventura.app`, `Install macOS Monterey.app`, `Install macOS Big Sur.app`, `Install macOS Catalina.app`, `Install macOS Mojave.app`, `Install macOS High Sierra.app`, `Install macOS Sierra.app`, `Install OS X El Capitan.app`, `Install OS X Yosemite.app`, `Install OS X Mavericks.app`, `Install OS X Mountain Lion.app`, or `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`. See also [How to create a bootable installer for macOS?](https://support.apple.com/en-us/HT201372).
+* `Install macOS Sequoia.app` or
+* `Install macOS Sonoma.app` or
+* `Install macOS Ventura.app` or
+* `Install macOS Monterey.app` or 
+* `Install macOS Big Sur.app` or
+* `Install macOS Catalina.app` or
+* `Install macOS Mojave.app` or
+* `Install macOS High Sierra.app` or
+* `Install macOS Sierra.app` or
+* `Install OS X El Capitan.app` or
+* `Install OS X Yosemite.app` or
+* `Install OS X Mavericks.app` or
+* `Install OS X Mountain Lion.app` or
+* `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`. See also [How to create a bootable installer for macOS?](https://support.apple.com/en-us/HT201372) or
+* a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
+
 > [!TIP]
-> It also works on bootable macOS install media that has been created and patched by the [OpenCore Legacy Patcher](https://dortania.github.io/OpenCore-Legacy-Patcher/).
-* Alternatively, a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
+> It also works with bootable macOS install media that has been created and patched by the [OpenCore Legacy Patcher](https://dortania.github.io/OpenCore-Legacy-Patcher/).
 
 
 How to configure and install it
@@ -144,6 +158,11 @@ BuildVersion:	22A380
 ProductName:	macOS
 ProductVersion:	14.0
 BuildVersion:	23A344
+
+/Applications/Install macOS Sequoia.app:
+ProductName:	macOS
+ProductVersion:	15.0
+BuildVersion:	24A335
 ```
 
 If you specify program parameters, the script prints out product name, product version and build version for each Install OS X .app folder that you have specified.
