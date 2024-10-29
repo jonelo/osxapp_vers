@@ -28,11 +28,12 @@ What are the input requirements
 * `Install OS X Yosemite.app` or
 * `Install OS X Mavericks.app` or
 * `Install OS X Mountain Lion.app` or
-* `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or on a bootable macOS install media that has been created by Apple's `createinstallmedia`. See also [How to create a bootable installer for macOS?](https://support.apple.com/en-us/HT201372) or
+* `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or
+* a bootable macOS install media that has been created by Apple's `createinstallmedia`. See also [How to create a bootable installer for macOS?](https://support.apple.com/en-us/HT201372) or
 * a mounted Mac OS X Install CD/DVD image such as `Mac OS X Install DVD`, `Mac OS X Install CD` or `Mac OS X Install Disk`
 
 > [!TIP]
-> It also works with bootable macOS install media that has been created and patched by the [OpenCore Legacy Patcher](https://dortania.github.io/OpenCore-Legacy-Patcher/).
+> The script also works with bootable macOS install media that has been created and patched by the [OpenCore Legacy Patcher](https://dortania.github.io/OpenCore-Legacy-Patcher/).
 
 
 How to configure and install it
