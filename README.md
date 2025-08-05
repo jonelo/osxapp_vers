@@ -190,6 +190,13 @@ ProductVersion: 10.9.2
 BuildVersion:   13C64
 ```
 
+To get the version of the script simply enter
+
+```bash
+% grep osxapp_vers ./osxapp_vers
+# osxapp_vers 1.15
+```
+
 
 The license
 -----------
