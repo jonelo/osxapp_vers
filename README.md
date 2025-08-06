@@ -15,6 +15,7 @@ What are the system requirements
 
 What are the input requirements
 -------------------------------
+* `Install macOS Tahoe.app` or
 * `Install macOS Sequoia.app` or
 * `Install macOS Sonoma.app` or
 * `Install macOS Ventura.app` or
