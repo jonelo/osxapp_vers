@@ -193,6 +193,7 @@ That approach also works for macOS Beta releases.
 
 ```bash
 % ./osxapp_vers /Volumes/Install\ macOS\ Tahoe\ Beta/Install\ macOS\ Tahoe\ Beta.app
+/Volumes/Install macOS Tahoe Beta/Install macOS Tahoe Beta.app:
 ProductName:	macOS
 ProductVersion:	26.0
 BuildVersion:	25A5316i
