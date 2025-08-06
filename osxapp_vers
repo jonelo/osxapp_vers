@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.15
+# osxapp_vers 1.16
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
@@ -43,7 +43,7 @@ function print_xml_info {
 
 # Supported OS names for the "Install *OS X <name>.app", resp. 
 # "Install macOS <name>.app", update list if applicable
-SUPPORTED_OS=('Sequoia' 'Sonoma' 'Ventura' 'Monterey' 'Big Sur' 'Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
+SUPPORTED_OS=('Tahoe' 'Sequoia' 'Sonoma' 'Ventura' 'Monterey' 'Big Sur' 'Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
 
 # Do we want verbose output?
 if [ -z "$DEBUG" ]; then
