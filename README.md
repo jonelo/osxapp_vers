@@ -192,11 +192,10 @@ BuildVersion:   13C64
 That approach also works for macOS Beta releases.
 
 ```bash
-% ./osxapp_vers /Volumes/Install\ macOS\ Tahoe\ Beta/Install\ macOS\ Tahoe\ Beta.app 
-/Volumes/Install macOS Tahoe Beta/Install macOS Tahoe Beta.app:
-ProductName:	   macOS
+% ./osxapp_vers /Volumes/Install\ macOS\ Tahoe\ Beta/Install\ macOS\ Tahoe\ Beta.app
+ProductName:	macOS
 ProductVersion:	26.0
-BuildVersion:	  25A5316i
+BuildVersion:	25A5316i
 ```
 
 To get the version of the script simply enter
