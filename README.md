@@ -171,6 +171,11 @@ BuildVersion:	23A344
 ProductName:	macOS
 ProductVersion:	15.0
 BuildVersion:	24A335
+
+/Applications/Install macOS Tahoe.app:
+ProductName:	macOS
+ProductVersion:	26.0
+BuildVersion:	25A354
 ```
 
 If you specify program parameters, the script prints out product name, product version and build version for each Install OS X .app folder that you have specified.
