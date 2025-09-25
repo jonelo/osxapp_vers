@@ -40,6 +40,10 @@ What are the input requirements
 > [!TIP]
 > The script also works with bootable macOS install media that has been created and patched by the [OpenCore Legacy Patcher](https://dortania.github.io/OpenCore-Legacy-Patcher/).
 
+> [!TIP]
+> Starting with macOS Tahoe, you will no longer be able to download the installer from the App Store directly. Use the softwareupdate instead.
+> `softwareupdate --fetch-full-installer --full-installer-version 26.0`
+
 
 How to configure and install it
 -------------------------------
