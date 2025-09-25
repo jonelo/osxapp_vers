@@ -213,7 +213,7 @@ To get the version of the script simply enter
 
 ```bash
 % grep osxapp_vers ./osxapp_vers
-# osxapp_vers 1.15
+# osxapp_vers 1.16
 ```
 
 
