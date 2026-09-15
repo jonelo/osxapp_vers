@@ -3,9 +3,9 @@ osxapp_vers
 
 What the project is for
 -----------------------
-The script called osxapp_vers finds the product name, the complete product version, and build version in an `Install*OS X*.app` package, in an `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out like the macOS' `/usr/bin/sw_vers` does for an installed macOS product.
+The script called osxapp_vers finds the product name, the complete product version, and the build version in an `Install*OS X*.app` package, in an `Install macOS*.app` package or in a mounted CD/DVD image called `Mac OS X Install *` and prints the info out the way macOS's `/usr/bin/sw_vers` does for an installed macOS product.
 
-The idea for this has been described at [my blog](https://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
+The idea for this is described on [my blog](https://loefflmann.blogspot.de/2015/03/finding-os-x-version-and-build-in-install-os-x-app.html).
 
 
 What are the system requirements
@@ -15,6 +15,7 @@ What are the system requirements
 
 What are the input requirements
 -------------------------------
+* `Install macOS 27 Golden Gate.app` or
 * `Install macOS Tahoe.app` or
 * `Install macOS Sequoia.app` or
 * `Install macOS Sonoma.app` or
@@ -30,18 +31,18 @@ What are the input requirements
 * `Install OS X Mavericks.app` or
 * `Install OS X Mountain Lion.app` or
 * `Install Mac OS X Lion.app` from the Apple App Store (1st public version or any update release) or
-* a bootable macOS install media that has been created by Apple's `createinstallmedia`
-  * See also [How to create a bootable installer for macOS?](https://support.apple.com/en-us/HT201372) or
+* bootable macOS install media created by Apple's `createinstallmedia`
+  * See also [How to create a bootable installer for macOS](https://support.apple.com/en-us/HT201372) or
 * a mounted Mac OS X Install CD/DVD image such as
   * `Mac OS X Install DVD` or
   * `Mac OS X Install CD` or
   * `Mac OS X Install Disk`
 
 > [!TIP]
-> The script also works with bootable macOS install media that has been created and patched by the [OpenCore Legacy Patcher](https://dortania.github.io/OpenCore-Legacy-Patcher/).
+> The script also works with bootable macOS install media created and patched by the [OpenCore Legacy Patcher](https://dortania.github.io/OpenCore-Legacy-Patcher/).
 
 > [!TIP]
-> Starting with macOS Tahoe, you will no longer be able to download the installer from the App Store directly. Use the softwareupdate instead.
+> Starting with macOS Tahoe, you will no longer be able to download the installer directly from the App Store. Use `softwareupdate` instead.
 > `softwareupdate --fetch-full-installer --full-installer-version 26.0`
 
 
@@ -65,12 +66,12 @@ In order to bypass a check that prevents the script from investigating an unknow
 % export NOCHECK=1
 ```
 
-In order to see details from the mount actions and additional messages, you can enable debug output by exporting the DEBUG environment variable. Usually there is no need to do that.
+In order to see details of the mount actions and additional messages, you can enable debug output by exporting the DEBUG environment variable. Usually there is no need to do that.
 
 ```bash
 % export DEBUG=/dev/stdout
 ```
- 
+
 If you want to disable debug mode again, enter
 
 ```bash
@@ -92,7 +93,7 @@ How to run it without installing it
 
 Examples of how to use it or get it running
 -------------------------------------------
-By default, if you don't specify any program parameters, the script reads all `Install*OS X*.app`, and `Install macOS X*.app` known to Spotlight and all `/Volumes/Mac OS X Install *` and prints out product name, product version and build version for each macOS that those installers are loaded with.
+By default, if you don't specify any program parameters, the script reads all `Install*OS X*.app` and `Install macOS *.app` folders known to Spotlight and all `/Volumes/Mac OS X Install *` volumes, and prints out the product name, product version and build version for the macOS release that each of those installers contains.
 
 Example output from runs without any program parameters:
 
@@ -176,9 +177,14 @@ BuildVersion:	24A335
 ProductName:	macOS
 ProductVersion:	26.0
 BuildVersion:	25A354
+
+/Applications/Install macOS 27 Golden Gate.app:
+ProductName:	macOS
+ProductVersion:	27.0
+BuildVersion:	26A428
 ```
 
-If you specify program parameters, the script prints out product name, product version and build version for each Install OS X .app folder that you have specified.
+If you specify program parameters, the script prints out the product name, product version and build version for each installer app that you have specified.
 
 ```bash
 % ./osxapp_vers '/Applications/Install OS X Mavericks.app'
@@ -189,7 +195,7 @@ ProductVersion: 10.9.4
 BuildVersion:   13E28
 ```
 
-If you have created a bootable macOS install media with `createinstallmedia` (that command line tool is provided by Apple as part of the OS X installer starting with Mavericks), you could also find out the version of macOS version that is on the install media by specifying the path to the .app folder.
+If you have created a bootable macOS install media with `createinstallmedia` (that command-line tool is provided by Apple as part of the OS X installer starting with Mavericks), you can also find out which macOS version is on the install media by specifying the path to the .app folder.
 
 ```bash
 % ./osxapp_vers '/Volumes/Install OS X Mavericks/Install OS X Mavericks.app/'
@@ -199,7 +205,7 @@ ProductVersion: 10.9.2
 BuildVersion:   13C64
 ```
 
-That approach also works for macOS Beta releases.
+That approach also works for macOS beta releases.
 
 ```bash
 % ./osxapp_vers /Volumes/Install\ macOS\ Tahoe\ Beta/Install\ macOS\ Tahoe\ Beta.app
@@ -209,11 +215,11 @@ ProductVersion:	26.0
 BuildVersion:	25A5316i
 ```
 
-To get the version of the script simply enter
+To get the version of the script, simply enter
 
 ```bash
 % grep osxapp_vers ./osxapp_vers
-# osxapp_vers 1.16
+# osxapp_vers 1.17
 ```
 
 
