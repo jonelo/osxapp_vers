@@ -1,22 +1,52 @@
-September 26, 2026
+September 16, 2026, v1.18
+- fixed: no product name, product version and build version was printed for a
+  mounted Mac OS X Install CD/DVD image, because the name of the plist file was
+  passed to print_xml_info instead of the content of the plist file; a
+  regression that was introduced with v1.10 when print_xml_info was changed
+  from reading a file to taking the xml content
+- fixed: an install stub printed a "No such file or directory" error on stderr,
+  because the SystemVersion.plist was read even if nothing had been mounted
+- fixed: "Install Mac OS X Lion.app" was never found without program
+  arguments, because a Spotlight pattern is anchored at the beginning of the
+  file name and therefore "Install OS X *.app" cannot match it
+- fixed: the exit code was always 0, even if nothing could be read at all; the
+  script exits with 1 now if at least one installer could not be investigated
+- fixed: a failed "hdiutil attach" went unnoticed, the script printed the path
+  followed by an empty line and no error message at all
+- fixed: an installer path that contains *, ? or [ ] could be garbled, because
+  the pathname expansion was still active
+- fixed: a path without the .app suffix was cut at the last dot, so that a dot
+  in one of the parent folders led to a wrong app name
+- fixed: a path that does not exist was reported as an unsupported macOS
+  release instead of a missing folder
+- fixed: the "Resource busy" check was missing for the
+  "/Volumes/Shared Support" mount point that the Big Sur and Monterey
+  installers leave open
+- fixed: pressing Ctrl-C left the BaseSystem and InstallESD mount points behind
+- fixed: the MobileAsset archive was passed to unzip without checking that it
+  exists and that there is exactly one of them
+- changed: informational and error messages go to stderr now, stdout contains
+  the header line and the version info only
+
+September 15, 2026, v1.17
 - added support for macOS 27.0 (Golden Gate)
 
-September 25, 2025
+September 25, 2025, v1.16
 - added support for macOS 26.0 (Tahoe)
 
 August 6, 2025
 - added support for macOS 26.0 (Tahoe) - Tahoe is currently in Beta
 
-September 18, 2024
+September 18, 2024, v1.15
 - added support for macOS 15.0 (Sequoia)
 
-October 3, 2023
+October 3, 2023, v1.14
 - added support for macOS 14.0 (Sonoma)
 
-August 18, 2023
+August 18, 2023, v1.13
 - added support for macOS 13.5.1
 
-October 29, 2022
+October 29, 2022, v1.12
 - added support for macOS 13.x (Ventura)
 
 October 31, 2021, v1.11

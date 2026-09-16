@@ -98,10 +98,25 @@ By default, if you don't specify any program parameters, the script reads all `I
 Example output from runs without any program parameters:
 
 ```bash
+/Volumes/Mac OS X Install Disc 1:
+ProductName:    Mac OS X
+ProductVersion: 10.3
+BuildVersion:   7B85
+
+/Volumes/Mac OS X Install DVD:
+ProductName:    Mac OS X
+ProductVersion: 10.4
+BuildVersion:   8A428
+
 /Volumes/Mac OS X Install DVD:
 ProductName:    Mac OS X
 ProductVersion: 10.5
 BuildVersion:   9A581
+
+/Volumes/Mac OS X Install DVD:
+ProductName:    Mac OS X
+ProductVersion: 10.6
+BuildVersion:   10A432
 
 /Applications/Install Mac OS X Lion.app:
 ProductName:    Mac OS X
@@ -205,21 +220,31 @@ ProductVersion: 10.9.2
 BuildVersion:   13C64
 ```
 
-That approach also works for macOS beta releases.
+That approach also works for macOS beta releases. The name of a beta installer (`Install macOS Tahoe Beta.app`) is not part of the list of known releases, therefore the `NOCHECK` environment variable is required in that case.
 
 ```bash
-% ./osxapp_vers /Volumes/Install\ macOS\ Tahoe\ Beta/Install\ macOS\ Tahoe\ Beta.app
+% NOCHECK=1 ./osxapp_vers /Volumes/Install\ macOS\ Tahoe\ Beta/Install\ macOS\ Tahoe\ Beta.app
 /Volumes/Install macOS Tahoe Beta/Install macOS Tahoe Beta.app:
 ProductName:	macOS
 ProductVersion:	26.0
 BuildVersion:	25A5316i
 ```
 
+Informational and error messages go to stderr, only the header line and the product name, product version and build version go to stdout. That way `./osxapp_vers > versions.txt` contains the version info only. The script exits with 0 if every installer that has been found could be read, and with 1 if at least one of them could not be read.
+
+```bash
+% ./osxapp_vers '/Applications/Install macOS Tahoe.app' 2>/dev/null
+/Applications/Install macOS Tahoe.app:
+ProductName:	macOS
+ProductVersion:	26.7
+BuildVersion:	25G229
+```
+
 To get the version of the script, simply enter
 
 ```bash
 % grep osxapp_vers ./osxapp_vers
-# osxapp_vers 1.17
+# osxapp_vers 1.18
 ```
 
 

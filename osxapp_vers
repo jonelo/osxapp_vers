@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# osxapp_vers 1.17
+# osxapp_vers 1.18
 # Get product name, product version and build version of [Mac] OS X
 # from "Install*OS X*.app", "Install macOS *.app" or "Mac OS X install DVD"
 #
@@ -21,17 +21,31 @@
 # Explicitly set the PATH
 PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 
+# The exit code of this script, set to 1 as soon as anything goes wrong
+RC=0
+
+# Do we want verbose output?
+if [ -z "$DEBUG" ]; then
+    DEBUG=/dev/null
+else
+    DEBUG=/dev/stdout
+fi
+
+# The mount points are $$-suffixed, so that concurrent runs don't collide
+MOUNT_BASESYSTEM="/Volumes/BaseSystem.$$"
+MOUNT_INSTALLESD="/Volumes/InstallESD.$$"
+
 # Prints one token from a xml content, prints nothing if there is no match
 # Params: $1: xml content, $2: key in the xml, $3: key name in the output
 function print_xml_token {
     # Extract the token name from the xml
     if [[ "$1" =~ \<key\>$2\</key\>[[:space:]]*\<string\>([^\<]+)\</string\> ]]; then
-        printf "$3:\t%s\n" "${BASH_REMATCH[1]}"
+        printf '%s:\t%s\n' "$3" "${BASH_REMATCH[1]}"
     fi
 }
 
 # Prints ProductName, ProductVersion and BuildVersion from a xml content
-# Params: $1: the name of the xml file
+# Params: $1: xml content
 function print_xml_info {
     XMLCONTENT="$1"
 
@@ -41,27 +55,57 @@ function print_xml_info {
     printf "\n"
 }
 
+# Prints the header line and the version info of a xml content
+# Params: $1: the path that the xml content belongs to, $2: xml content
+# Returns 0 on success, 1 if the xml content has no version info at all
+function print_info {
+    if [[ ! "$2" =~ \<key\>ProductVersion\</key\> ]]; then
+        printf "ERROR: no version information found in \"%s\".\n" "$1" >&2
+        return 1
+    fi
+
+    printf "%s:\n" "$1"
+    print_xml_info "$2"
+    return 0
+}
+
+# Attaches a dmg to one of our mount points
+# Params: $1: the dmg to be attached, $2: the mount point
+# Returns 0 on success, 1 if the dmg could not be mounted
+function attach_dmg {
+    if ! hdiutil attach "$1" -noverify -nobrowse -mountpoint "$2" &> $DEBUG; then
+        printf "ERROR: could not mount \"%s\".\n" "$1" >&2
+        return 1
+    fi
+
+    return 0
+}
+
+# A Ctrl-C must not leave our mount points behind
+trap 'hdiutil detach "$MOUNT_BASESYSTEM" &> $DEBUG; hdiutil detach "$MOUNT_INSTALLESD" &> $DEBUG; exit 130' INT TERM
+
 # Supported OS names for the "Install *OS X <name>.app", resp. 
 # "Install macOS <name>.app", update list if applicable
 SUPPORTED_OS=('27 Golden Gate' 'Tahoe' 'Sequoia' 'Sonoma' 'Ventura' 'Monterey' 'Big Sur' 'Catalina' 'Mojave' 'High Sierra' 'Sierra' 'El Capitan' 'Yosemite' 'Mavericks' 'Mountain Lion' 'Lion')
-
-# Do we want verbose output?
-if [ -z "$DEBUG" ]; then
-    DEBUG=/dev/null
-else
-    DEBUG=/dev/stdout
-fi
 
 # Backup and set the Internal Field Separator (IFS) to newline,
 # because there are blanks in the filename called "Install OS X *.app"
 IFS_BACKUP=$IFS
 IFS=$'\n'
 
+# Switch off the pathname expansion, because an installer path may contain
+# characters such as * or [ ] that must not be expanded. It is switched on
+# again temporarily wherever a glob is actually wanted.
+set -f
+
 if [ $# = 0 ]; then
     # No args have been given
-    # Find any OS X/macOS installers known to the Spotlight
+    # Find any OS X/macOS installers known to the Spotlight.
+    # The Spotlight pattern is anchored at the beginning of the file name,
+    # that is why "Install *OS X *.app" is required in order to also match
+    # "Install Mac OS X Lion.app"
     FILES=$(
-             mdfind "kMDItemFSName == 'Install OS X *.app'" 2>/dev/null;\
+             mdfind "kMDItemFSName == 'Install *OS X *.app'" 2>/dev/null;\
              mdfind "kMDItemFSName == 'Install macOS *.app'" 2>/dev/null;\
            )
 else
@@ -71,23 +115,32 @@ fi
 
 # Error message if there is no installer
 if [ -z "$FILES" ]; then
-    printf "INFO:  There is no \"Install *OS X *.app\" and no \"Install macOS *.app\" known to Spotlight\n"
+    printf "INFO:  There is no \"Install *OS X *.app\" and no \"Install macOS *.app\" known to Spotlight\n" >&2
 else
     for FILE in $FILES; do
-        # print the app folder
-        printf "%s:\n" "$FILE"
+        # Remove a trailing slash if there is one
+        APPNAME=${FILE%/}
 
-        # Remove everything from the end including . (non-greedy)
-        # In other words, .app or .app/ will be removed from the end
-        APPNAME=${FILE%.*}
+        # The OS name is derived from the name of the .app only, because the
+        # path may contain dots and the words "OS X" resp. "macOS" as well
+        BASENAME=${APPNAME##*/}
 
         # Remove everything from the beginning including "OS X " or "macOS "
-        OSNAME=${APPNAME}
+        OSNAME=${BASENAME%.app}
         OSNAME=${OSNAME##*OS\ X\ }
         OSNAME=${OSNAME##*macOS\ }
 
-        # Re-add the .app suffix
-        APPNAME="$APPNAME.app"
+        # Re-add the .app suffix if it is missing
+        case "$APPNAME" in
+            *.app) ;;
+                *) APPNAME="$APPNAME.app" ;;
+        esac
+
+        if [ ! -d "$APPNAME" ]; then
+            printf "ERROR: \"%s\" does not exist.\n" "$APPNAME" >&2
+            RC=1
+            continue
+        fi
 
         if [ -z "$NOCHECK" ]; then
             # NOCHECK is not set
@@ -104,8 +157,9 @@ else
         fi
 
         if [ $SUPPORTED -eq 0 ]; then
-            printf "ERROR: Investigating the %s installer is not supported by this script.\n" "$OSNAME"
-            printf "       Set the NOCHECK environment variable to bypass this check.\n"
+            printf "ERROR: Investigating the %s installer is not supported by this script.\n" "$OSNAME" >&2
+            printf "       Set the NOCHECK environment variable to bypass this check.\n" >&2
+            RC=1
         else
             # The macOS Sierra installer leaves the mount point called "/Volumes/OS X Install ESD" open
             # after closing it, so let's try to unmount it now ...
@@ -113,77 +167,120 @@ else
             # exit code 16 means "Resource busy"
             if [ $? -eq 16 ]; then
                 # Give the user the option to close the installer manually.
-                printf "ERROR: Resource is in use. Please close the Apple installer. Exit.\n"
-                exit
+                printf "ERROR: Resource is in use. Please close the Apple installer. Exit.\n" >&2
+                IFS=$IFS_BACKUP
+                set +f
+                exit 1
             fi
+
+            # Nothing has been mounted yet and nothing has been read yet
+            CONTCODE=0
+            XMLCONTENT=""
 
             if [ -f "$APPNAME/Contents/SharedSupport/SharedSupport.dmg" ]; then
                 # The macOS Monterey installer (12.0.1) leaves the mount point open
                 # after closing it, so let's unmount it now ...
                 hdiutil detach "/Volumes/Shared Support" &> $DEBUG
+                # exit code 16 means "Resource busy"
+                if [ $? -eq 16 ]; then
+                    # Give the user the option to close the installer manually.
+                    printf "ERROR: Resource is in use. Please close the Apple installer. Exit.\n" >&2
+                    IFS=$IFS_BACKUP
+                    set +f
+                    exit 1
+                fi
 
                 # Starting with Big Sur (>= 11.0.1)
-                hdiutil attach "$APPNAME/Contents/SharedSupport/SharedSupport.dmg" \
-                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
-
-                CONTCODE=11
+                if attach_dmg "$APPNAME/Contents/SharedSupport/SharedSupport.dmg" "$MOUNT_BASESYSTEM"; then
+                    CONTCODE=11
+                fi
 
             elif [ -f "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" ]; then
                 # Starting with High Sierra (>= 10.13)
-                hdiutil attach "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" \
-                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
-
-                CONTCODE=1
+                if attach_dmg "$APPNAME/Contents/SharedSupport/BaseSystem.dmg" "$MOUNT_BASESYSTEM"; then
+                    CONTCODE=1
+                fi
 
             elif [ -f "$APPNAME/Contents/SharedSupport/InstallESD.dmg" ]; then
                 # Anything earlier then High Sierra (< 10.13) ...
-                hdiutil attach "$APPNAME/Contents/SharedSupport/InstallESD.dmg" \
-                    -noverify -nobrowse -mountpoint /Volumes/InstallESD.$$ &> $DEBUG
-
-                hdiutil attach "/Volumes/InstallESD.$$/BaseSystem.dmg" \
-                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
-
-                CONTCODE=2
+                if attach_dmg "$APPNAME/Contents/SharedSupport/InstallESD.dmg" "$MOUNT_INSTALLESD"; then
+                    if attach_dmg "$MOUNT_INSTALLESD/BaseSystem.dmg" "$MOUNT_BASESYSTEM"; then
+                        CONTCODE=2
+                    else
+                        # the outer image must not stay behind
+                        hdiutil detach "$MOUNT_INSTALLESD" &> $DEBUG
+                    fi
+                fi
 
             elif [ -f "/macOS Install Data/BaseSystem.dmg" ]; then
-                printf "INFO: this an install stub and the install stub was running.\n"
-                # BaseSystem.dmg location is different if we have an install stub and
-                # the install stub was running
-                hdiutil attach "/macOS Install Data/BaseSystem.dmg" \
-                    -noverify -nobrowse -mountpoint /Volumes/BaseSystem.$$ &> $DEBUG
-
-                CONTCODE=1
+                # Note that this is an absolute path, it does not belong to the
+                # $APPNAME that is being investigated: an install stub has no
+                # payload of its own, the running stub downloads it to
+                # "/macOS Install Data". If there is more than one install stub
+                # in a single run, the same version is reported for each of them.
+                printf "INFO:  this is an install stub and the install stub was running.\n" >&2
+                if attach_dmg "/macOS Install Data/BaseSystem.dmg" "$MOUNT_BASESYSTEM"; then
+                    CONTCODE=1
+                fi
 
             else
-                printf "ERROR: this seems to be an install stub only, run it in order to download the required files.\n"
-                CONTCODE=0
+                printf "ERROR: this seems to be an install stub only, run it in order to download the required files.\n" >&2
 
             fi
 
+            if [ $CONTCODE -eq 0 ]; then
+                # nothing has been mounted, the error message has been printed already
+                RC=1
+            fi
+
             # call sw_vers in the changed root environment
-            # sudo chroot "/Volumes/BaseSystem.$$" /usr/bin/sw_vers
+            # sudo chroot "$MOUNT_BASESYSTEM" /usr/bin/sw_vers
 
             if [ $CONTCODE -eq 11 ]; then
-                if [ -d "/Volumes/BaseSystem.$$/SFR/" ]; then
-                    XMLCONTENT=$(unzip -c /Volumes/BaseSystem.$$/SFR/com_apple_MobileAsset_SFRSoftwareUpdate/*.zip AssetData/boot/SystemVersion.plist)
+                if [ -d "$MOUNT_BASESYSTEM/SFR/" ]; then
+                    ASSETDIR="$MOUNT_BASESYSTEM/SFR/com_apple_MobileAsset_SFRSoftwareUpdate"
                 # e.g. macOS 13.5.1
                 else
-                    XMLCONTENT=$(unzip -c /Volumes/BaseSystem.$$/com_apple_MobileAsset_MacSoftwareUpdate/*.zip AssetData/boot/SystemVersion.plist)
+                    ASSETDIR="$MOUNT_BASESYSTEM/com_apple_MobileAsset_MacSoftwareUpdate"
                 fi
+
+                # the pathname expansion is switched off globally, we need it here
+                set +f
+                ZIPS=("$ASSETDIR"/*.zip)
+                set -f
+
+                if [ ${#ZIPS[@]} -ne 1 ] || [ ! -f "${ZIPS[0]}" ]; then
+                    printf "ERROR: expected exactly one MobileAsset archive in \"%s\".\n" "$ASSETDIR" >&2
+                elif ! XMLCONTENT=$(unzip -c "${ZIPS[0]}" AssetData/boot/SystemVersion.plist 2> $DEBUG); then
+                    printf "ERROR: could not read the SystemVersion.plist from \"%s\".\n" "${ZIPS[0]}" >&2
+                    XMLCONTENT=""
+                fi
+
                 CONTCODE=1
-            else
-                XMLCONTENT=$(<"/Volumes/BaseSystem.$$/System/Library/CoreServices/SystemVersion.plist")
+            elif [ $CONTCODE -gt 0 ]; then
+                XMLFILE="$MOUNT_BASESYSTEM/System/Library/CoreServices/SystemVersion.plist"
+
+                if [ -f "$XMLFILE" ]; then
+                    XMLCONTENT=$(<"$XMLFILE")
+                else
+                    printf "ERROR: no SystemVersion.plist found in \"%s\".\n" "$APPNAME" >&2
+                fi
             fi
 
             if [ $CONTCODE -gt 0 ]; then
                 # Read the xml and print info
-                print_xml_info "$XMLCONTENT"
+                if [ -n "$XMLCONTENT" ]; then
+                    print_info "$FILE" "$XMLCONTENT" || RC=1
+                else
+                    # the error message has been printed already
+                    RC=1
+                fi
 
                 # Unmount again in reverse order
-                hdiutil detach "/Volumes/BaseSystem.$$" &> $DEBUG
+                hdiutil detach "$MOUNT_BASESYSTEM" &> $DEBUG
 
                 if [ $CONTCODE -gt 1 ]; then
-                    hdiutil detach "/Volumes/InstallESD.$$" &> $DEBUG
+                    hdiutil detach "$MOUNT_INSTALLESD" &> $DEBUG
                 fi
             fi
         fi
@@ -196,27 +293,32 @@ fi
 if [ $# = 0 ]; then
     # No args have been given
     # Find any mounted Mac OS X Install CD/DVD images in /Volumes
+    # (the pathname expansion is switched off globally, we need it here)
+    set +f
     FILES=$(ls -ld1 /Volumes/Mac\ OS\ X\ Install\ * 2>/dev/null)
+    set -f
 
     # Message if there are no mounted DVD images 
     if [ -z "$FILES" ]; then
-        printf "INFO: No mounted Mac OS X Install CD/DVD images found\n"
-        printf "      (no \"Mac OS X Install *\" in /Volumes)\n"
+        printf "INFO:  No mounted Mac OS X Install CD/DVD images found\n" >&2
+        printf "       (no \"Mac OS X Install *\" in /Volumes)\n" >&2
     else
         for FILE in $FILES; do
             XML="$FILE/System/Library/CoreServices/SystemVersion.plist"
             # there are also Disk 2 and Disk 3 CDs that don't contain
             # an installer
             if [ -f "$XML" ]; then
-                # print the app folder
-                printf "%s:\n" "$FILE"
-                print_xml_info "$XML"
+                # print the app folder and the info
+                print_info "$FILE" "$(<"$XML")" || RC=1
             else
-                printf "INFO: \"%s\" found, but it does not contain an installer\n" "$FILE"
+                printf "INFO:  \"%s\" found, but it does not contain an installer\n" "$FILE" >&2
             fi
         done
     fi
 fi
 
-# Restore the IFS
+# Restore the IFS and the pathname expansion
 IFS=$IFS_BACKUP
+set +f
+
+exit $RC
